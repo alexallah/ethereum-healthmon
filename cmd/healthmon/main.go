@@ -89,6 +89,6 @@ func statusHandler(w http.ResponseWriter, req *http.Request) {
 		io.WriteString(w, "OK")
 	} else {
 		w.WriteHeader(503)
-		io.WriteString(w, "Down")
+		io.WriteString(w, "NOT READY")
 	}
 }
