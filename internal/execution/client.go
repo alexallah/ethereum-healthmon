@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -141,5 +141,5 @@ func request(addr, token string, timeout int64, payload []byte) ([]byte, error) 
 		return nil, fmt.Errorf("incorrect response status code: %d", resp.StatusCode)
 	}
 
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }

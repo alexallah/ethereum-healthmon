@@ -2,7 +2,7 @@ package execution
 
 import (
 	"encoding/hex"
-	"io/ioutil"
+	"os"
 	"strings"
 	"time"
 
@@ -10,7 +10,7 @@ import (
 )
 
 func readJwt(jwtPath string) string {
-	data, err := ioutil.ReadFile(jwtPath)
+	data, err := os.ReadFile(jwtPath)
 	if err != nil {
 		panic(err)
 	}

@@ -81,6 +81,7 @@ func main() {
 	log.Printf("healthmon listenting on %s\n", fullServiceAddr)
 
 	http.HandleFunc("/ready", statusHandler)
+	http.HandleFunc("/metrics", metricsHandler)
 	http.ListenAndServe(fullServiceAddr, nil)
 }
 
@@ -91,4 +92,12 @@ func statusHandler(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(503)
 		io.WriteString(w, "NOT READY")
 	}
+}
+
+func metricsHandler(w http.ResponseWriter, req *http.Request) {
+	var ready int
+	if state.IsHealthy() {
+		ready = 1
+	}
+	io.WriteString(w, fmt.Sprintf("# TYPE ready gauge\nready %d\n", ready))
 }
