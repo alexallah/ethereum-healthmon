@@ -27,12 +27,12 @@ func loadCertificateFromFile(certFile string) (*x509.Certificate, error) {
 func GetTLSConfig(certFile string) (*tls.Config, error) {
 	cp := x509.NewCertPool()
 
-	certificiate, err := loadCertificateFromFile(certFile)
+	certificate, err := loadCertificateFromFile(certFile)
 	if err != nil {
 		return nil, fmt.Errorf("can not load credentials, %w", err)
 	}
 
-	cp.AddCert(certificiate)
+	cp.AddCert(certificate)
 
 	return &tls.Config{
 		RootCAs: cp,

@@ -16,7 +16,7 @@ import (
 
 type Options struct {
 	Chain   string `long:"chain" description:"Ethereum chain" choice:"execution" choice:"beacon" required:"true"`
-	Port    int    `long:"port" description:"Node port (default: auto, default for the chain)"`
+	Port    int    `long:"port" description:"Node port (default: 8551 for execution, 4000 for beacon)"`
 	Addr    string `long:"addr" description:"Node address" default:"localhost"`
 	Timeout int64  `long:"timeout" description:"Node connection timeout, seconds" default:"5"`
 
@@ -32,8 +32,8 @@ type Options struct {
 	} `group:"Beacon chain" namespace:"beacon"`
 
 	Service struct {
-		Port int    `long:"port" description:"healthmon service port" default:"21171"`
-		Addr string `long:"addr" description:"healthmon service address" default:"0.0.0.0"`
+		Port int    `long:"port" description:"healthmon listening port" default:"21171"`
+		Addr string `long:"addr" description:"healthmon listening address" default:"0.0.0.0"`
 	} `group:"healthcheck service" namespace:"service"`
 }
 
@@ -50,7 +50,7 @@ func main() {
 	state = new(common.State)
 
 	// default node port
-	nodePort := 30303 // execution
+	nodePort := 8551 // execution
 	if opts.Chain == "beacon" {
 		nodePort = 4000
 	}

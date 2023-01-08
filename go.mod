@@ -14,14 +14,11 @@ require (
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
 	github.com/ethereum/go-ethereum v1.10.26 // indirect
-	github.com/ferranbt/fastssz v0.0.0-20210526181520-7df50c8568f8 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.3 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/prysmaticlabs/eth2-types v0.0.0-20210303084904-c9735a06829d // indirect
-	github.com/prysmaticlabs/ethereumapis v0.0.0-20220804141212-99a982d2918a // indirect
 	github.com/prysmaticlabs/fastssz v0.0.0-20221107182844-78142813af44 // indirect
 	github.com/prysmaticlabs/go-bitfield v0.0.0-20210809151128-385d8c5e3fb7 // indirect
 	github.com/prysmaticlabs/gohashtree v0.0.2-alpha // indirect
