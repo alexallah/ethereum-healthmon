@@ -16,16 +16,16 @@ import (
 
 type Options struct {
 	Chain   string `long:"chain" description:"Ethereum chain" choice:"execution" choice:"beacon" required:"true"`
-	Port    int    `long:"port" description:"Node port (default: 8551 for execution, 4000 for beacon)"`
+	Port    int    `long:"port" description:"Node port (default: 8545 for execution, 4000 for beacon)"`
 	Addr    string `long:"addr" description:"Node address" default:"localhost"`
 	Timeout int64  `long:"timeout" description:"Node connection timeout, seconds" default:"5"`
 
 	Execution struct {
-		Jwt string `long:"jwt" description:"JWT hex secret path"`
+		Jwt string `long:"engine-jwt" description:"JWT hex secret path. Use only when connecting to the engine RPC endpoint."`
 	} `group:"Execution chain" namespace:"execution"`
 
 	Beacon struct {
-		Certificate string `long:"certificate" description:"TLS root certificate path. Specify only if have it configured for your node as well."`
+		Certificate string `long:"certificate" description:"TLS root certificate path. Specify only if you have it configured for your node as well."`
 		Prysm       struct {
 			GRPC bool `long:"grpc" description:"Required if you're connecting to a Prysm node. If Prysm migrates to a JSON-RPC protocol in the future versions, this flag should be removed."`
 		} `group:"Prysm" namespace:"prysm"`
@@ -33,8 +33,8 @@ type Options struct {
 
 	Service struct {
 		Port int    `long:"port" description:"healthmon listening port" default:"21171"`
-		Addr string `long:"addr" description:"healthmon listening address" default:"0.0.0.0"`
-	} `group:"healthcheck service" namespace:"service"`
+		Addr string `long:"addr" description:"healthmon listening address. Set to 0.0.0.0 to allow external access." default:"localhost"`
+	} `group:"healthcheck service" namespace:"http"`
 }
 
 var state *common.State
@@ -50,7 +50,7 @@ func main() {
 	state = new(common.State)
 
 	// default node port
-	nodePort := 8551 // execution
+	nodePort := 8545 // execution
 	if opts.Chain == "beacon" {
 		nodePort = 4000
 	}
@@ -58,31 +58,28 @@ func main() {
 	if opts.Port != 0 {
 		nodePort = opts.Port
 	}
-	fullNodeAddr := fmt.Sprintf("%s:%d", opts.Addr, nodePort)
+	nodeAddr := fmt.Sprintf("%s:%d", opts.Addr, nodePort)
 
 	switch opts.Chain {
 	case "beacon":
 		if opts.Beacon.Prysm.GRPC {
-			beaconGRPC.StartUpdater(state, fullNodeAddr, opts.Timeout, opts.Beacon.Certificate)
+			beaconGRPC.StartUpdater(state, nodeAddr, opts.Timeout, opts.Beacon.Certificate)
 		} else {
-			beaconREST.StartUpdater(state, fullNodeAddr, opts.Timeout, opts.Beacon.Certificate)
+			beaconREST.StartUpdater(state, nodeAddr, opts.Timeout, opts.Beacon.Certificate)
 		}
 	case "execution":
-		if opts.Execution.Jwt == "" {
-			log.Fatalln("JWT path is not specified")
-		}
-		execution.StartUpdater(state, fullNodeAddr, opts.Timeout, opts.Execution.Jwt)
+		execution.StartUpdater(state, nodeAddr, opts.Timeout, opts.Execution.Jwt)
 	default:
 		log.Fatalf("unknown chain: %s.\n", opts.Chain)
 	}
 
-	log.Printf("%s node address is %s", opts.Chain, fullNodeAddr)
-	fullServiceAddr := fmt.Sprintf("%s:%d", opts.Service.Addr, opts.Service.Port)
-	log.Printf("healthmon listenting on %s\n", fullServiceAddr)
+	log.Printf("%s node address is %s", opts.Chain, nodeAddr)
+	serviceAddr := fmt.Sprintf("%s:%d", opts.Service.Addr, opts.Service.Port)
+	log.Printf("healthmon listenting on %s\n", serviceAddr)
 
 	http.HandleFunc("/ready", statusHandler)
 	http.HandleFunc("/metrics", metricsHandler)
-	http.ListenAndServe(fullServiceAddr, nil)
+	http.ListenAndServe(serviceAddr, nil)
 }
 
 func statusHandler(w http.ResponseWriter, req *http.Request) {

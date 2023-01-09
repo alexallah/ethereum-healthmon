@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/alexallah/ethereum-healthmon/internal/beacon"
-	"github.com/golang/protobuf/ptypes/empty"
-	eth "github.com/prysmaticlabs/prysm/proto/eth/service"
-	v1 "github.com/prysmaticlabs/prysm/proto/eth/v1"
+	eth "github.com/prysmaticlabs/prysm/v3/proto/eth/service"
+	v1 "github.com/prysmaticlabs/prysm/v3/proto/eth/v1"
 	grpc "google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func toSyncInfo(gSyncInfo *v1.SyncInfo) *beacon.SyncInfo {
@@ -28,8 +28,7 @@ func getSyncing(conn *grpc.ClientConn, timeout int64) (*beacon.SyncInfo, error) 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(timeout))
 	defer cancel()
 
-	in := new(empty.Empty)
-	response, err := c.GetSyncStatus(ctx, in)
+	response, err := c.GetSyncStatus(ctx, &emptypb.Empty{})
 	if err != nil {
 		return nil, err
 	}
@@ -41,8 +40,7 @@ func isHealthy(conn *grpc.ClientConn, timeout int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(timeout))
 	defer cancel()
 
-	in := new(empty.Empty)
-	_, err := c.GetHealth(ctx, in)
+	_, err := c.GetHealth(ctx, &emptypb.Empty{})
 	if err != nil {
 		return err
 	}

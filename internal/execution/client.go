@@ -126,7 +126,9 @@ func request(addr, token string, timeout int64, payload []byte) ([]byte, error) 
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	if token != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	}
 
 	client := &http.Client{
 		Timeout: time.Duration(timeout) * time.Second,

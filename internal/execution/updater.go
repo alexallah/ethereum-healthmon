@@ -9,7 +9,10 @@ import (
 )
 
 func StartUpdater(state *common.State, addr string, timeout int64, jwtPath string) {
-	secret := loadJwt(jwtPath)
+	var secret []byte
+	if jwtPath != "" {
+		secret = loadJwt(jwtPath)
+	}
 	// add http: prefix if necessary
 	if !strings.HasPrefix(addr, "http") {
 		addr = fmt.Sprintf("http://%s", addr)
@@ -21,7 +24,10 @@ func update(state *common.State, addr string, timeout int64, secret []byte) {
 	for {
 		time.Sleep(time.Second)
 
-		token := genToken(secret)
+		var token string
+		if secret != nil {
+			token = genToken(secret)
+		}
 		err := isReady(addr, token, timeout)
 
 		if err != nil {
