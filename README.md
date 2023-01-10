@@ -82,7 +82,7 @@ The certificate needs to be configured on the Prysm node as well. Using it is op
 
 #### Connect to Geth with JWT
 ```
-./healthmon --chain execution --port 8551 --execution.jwt jwt.hex
+./healthmon --chain execution --port 8551 --execution.engine-jwt jwt.hex
 ```
 We are connecting to an Engine RPC endpoint instead of a regular one on port 8545.
 That's why we need to provide a JWT secret file.
@@ -113,7 +113,7 @@ By default, the service is listening on localhost. If you are using Docker or ne
 ### Execution
 
 * It is possible to connect to a regular RPC or Engine RPC. Some clients have them on the same port.
-* `--execution.jwt` is required when connecting to an Engine RPC endpoint. Make sure it is the same one you have configured for your execution node.
+* `--execution.engine-jwt` is required when connecting to an Engine RPC endpoint. Make sure it is the same one you have configured for your execution node.
 
 ### Beacon
 
