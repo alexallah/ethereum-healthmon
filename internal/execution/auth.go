@@ -29,6 +29,9 @@ func loadJwt(jwtPath string) []byte {
 }
 
 func genToken(secret []byte) string {
+	if secret == nil {
+		panic("no secret")
+	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"iat": time.Now().Unix(),
 	})
