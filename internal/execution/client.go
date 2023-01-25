@@ -27,12 +27,22 @@ func isReady(addr, token string, timeout int64) error {
 		return fmt.Errorf("syncing, distance %d blocks", syncInfo.distance())
 	}
 
-	// wait for a new block
-	latest, err := getLatestBlock(addr, token, timeout)
+	// get latest block info
+	block, err := getLatestBlock(addr, token, timeout)
 	if err != nil {
 		return err
 	}
-	blockTrack.AddBlock(latest)
+	blockNumber, err := block.number()
+	if err != nil {
+		return err
+	}
+	blockTrack.AddBlock(blockNumber)
+	// make sure it is recent enough
+	if err := block.checkAge(); err != nil {
+		return err
+	}
+
+	// wait for a new block
 	if err := blockTrack.HealthCheck(); err != nil {
 		return err
 	}
@@ -71,6 +81,45 @@ type JsonResultString struct {
 	Result string `json:"result"`
 }
 
+type Block struct {
+	Timestamp string `json:"timestamp"`
+	Number    string `json:"number"`
+}
+
+func (b *Block) time() (time.Time, error) {
+	timeHex := strings.TrimLeft(b.Timestamp, "0x")
+	unixtime, err := strconv.ParseInt(timeHex, 16, 64)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("can not parse block timestamp: %w", err)
+	}
+	return time.Unix(unixtime, 0), nil
+}
+
+func (b *Block) number() (uint64, error) {
+	numHex := strings.TrimLeft(b.Number, "0x")
+	blockNumber, err := strconv.ParseUint(numHex, 16, 64)
+	if err != nil {
+		return 0, fmt.Errorf("can not parse block number: %w", err)
+	}
+	return blockNumber, nil
+}
+
+func (b *Block) checkAge() error {
+	created, err := b.time()
+	if err != nil {
+		return err
+	}
+	age := time.Since(created)
+	if age > 300*time.Second {
+		return fmt.Errorf("latest block is too old: %s", age.Truncate(time.Second))
+	}
+	return nil
+}
+
+type JsonResultBlock struct {
+	Result Block `json:"result"`
+}
+
 // execute an RPC request and return true if the server is synced and ready
 func getSyncing(addr, token string, timeout int64) (*SyncInfo, error) {
 	payload := []byte(`{"jsonrpc":"2.0","method":"eth_syncing","params":[],"id":1}`)
@@ -105,19 +154,19 @@ func parseUintFromHex(hex string) uint64 {
 	return result
 }
 
-func getLatestBlock(addr, token string, timeout int64) (uint64, error) {
-	payload := []byte(`{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}`)
+func getLatestBlock(addr, token string, timeout int64) (*Block, error) {
+	payload := []byte(`{"jsonrpc":"2.0","method":"eth_getBlockByNumber","params":["latest",false],"id":1}`)
 	body, err := request(addr, token, timeout, payload)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	result := new(JsonResultString)
+	result := new(JsonResultBlock)
 	if err := json.Unmarshal(body, result); err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return parseUintFromHex(result.Result), nil
+	return &result.Result, nil
 }
 
 func request(addr, token string, timeout int64, payload []byte) ([]byte, error) {
