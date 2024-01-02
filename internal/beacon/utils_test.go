@@ -90,7 +90,7 @@ func Test_GetTLSConfig(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		_, err := GetTLSConfig(test.file)
+		_, err := getTLSConfig(test.file)
 		if err != nil && test.result {
 			t.Error("cert is not supposed to be loaded", test.file)
 		}

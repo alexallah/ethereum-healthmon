@@ -11,7 +11,6 @@ Health monitoring for beacon and execution (eth1) nodes.
 - Works with both beacon and execution chains.
 - Can be easily integrated with a load balancer.
 - Exposes metrics for Prometheus.
-- Supports Prysm's gRPC protocol.
 - Can connect to the Engine RPC execution endpoint with JWT-based security.
 - Optional TLS encryption for beacon nodes.
 
@@ -85,11 +84,10 @@ chmod +x healthmon
 #### Monitor to Prysm using a secure connection
 
 ```
-./healthmon --chain=beacon --beacon.prysm.grpc --beacon.certificate=tls/ca.cert
+./healthmon --chain=beacon --beacon.certificate=tls/ca.cert
 ```
 
-The --beacon.prysm.grpc flag is required for Prysm at the moment.
-The certificate needs to be configured on the Prysm node as well. Using it is optional but recommended if programs are running on different computers.
+The certificate needs to be configured on the Prysm node as well. Using it is optional but recommended if applications are running on different computers.
 
 #### Connect to Geth with JWT
 
@@ -129,7 +127,3 @@ By default, the service is listening on localhost. If you are using Docker or ne
 
 - It is possible to connect to a regular RPC or Engine RPC. Some clients have them on the same port.
 - `--execution.engine-jwt` is required when connecting to an Engine RPC endpoint. Make sure it is the same one you have configured for your execution node.
-
-### Beacon
-
-Prysm uses a custom gRPC API to connect between beacon and validator nodes. They might move to the standard JSON API in the future, but for now, it is necessary to use `--beacon.prysm.grpc` when connecting to a Prysm node.

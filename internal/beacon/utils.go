@@ -27,7 +27,7 @@ func loadCertificateFromFile(certFile string) (*x509.Certificate, error) {
 	return certificate, nil
 }
 
-func GetTLSConfig(certFile string) (*tls.Config, error) {
+func getTLSConfig(certFile string) (*tls.Config, error) {
 	cp := x509.NewCertPool()
 
 	certificate, err := loadCertificateFromFile(certFile)

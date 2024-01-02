@@ -9,14 +9,14 @@ import (
 
 var blockTrack common.BlockTrack
 
-type SyncInfo struct {
+type syncInfo struct {
 	IsSyncing    bool   `json:"is_syncing"`
 	IsOptimistic bool   `json:"is_optimistic"`
 	HeadSlot     uint64 `json:"head_slot,string"`
 	SyncDistance uint64 `json:"sync_distance,string"`
 }
 
-func CheckSyncInfo(syncInfo *SyncInfo) error {
+func checkSyncInfo(syncInfo *syncInfo) error {
 	// distance
 	if syncInfo.IsSyncing || syncInfo.SyncDistance >= 5 {
 		return fmt.Errorf("syncing, distance %d slots", syncInfo.SyncDistance)

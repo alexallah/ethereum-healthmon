@@ -7,8 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	beaconGRPC "github.com/alexallah/ethereum-healthmon/internal/beacon/grpc"
-	beaconREST "github.com/alexallah/ethereum-healthmon/internal/beacon/rest"
+	"github.com/alexallah/ethereum-healthmon/internal/beacon"
 	"github.com/alexallah/ethereum-healthmon/internal/common"
 	"github.com/alexallah/ethereum-healthmon/internal/execution"
 	"github.com/jessevdk/go-flags"
@@ -26,9 +25,6 @@ type Options struct {
 
 	Beacon struct {
 		Certificate string `long:"certificate" description:"TLS root certificate path. Specify only if you have it configured for your node as well."`
-		Prysm       struct {
-			GRPC bool `long:"grpc" description:"Required if you're connecting to a Prysm node. If Prysm migrates to a JSON-RPC protocol in the future versions, this flag should be removed."`
-		} `group:"Prysm" namespace:"prysm"`
 	} `group:"Beacon chain" namespace:"beacon"`
 
 	Service struct {
@@ -62,11 +58,7 @@ func main() {
 
 	switch opts.Chain {
 	case "beacon":
-		if opts.Beacon.Prysm.GRPC {
-			beaconGRPC.StartUpdater(state, nodeAddr, opts.Timeout, opts.Beacon.Certificate)
-		} else {
-			beaconREST.StartUpdater(state, nodeAddr, opts.Timeout, opts.Beacon.Certificate)
-		}
+		beacon.StartUpdater(state, nodeAddr, opts.Timeout, opts.Beacon.Certificate)
 	case "execution":
 		execution.StartUpdater(state, nodeAddr, opts.Timeout, opts.Execution.Jwt)
 	default:

@@ -1,23 +1,21 @@
-package rest
+package beacon
 
 import (
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-
-	"github.com/alexallah/ethereum-healthmon/internal/beacon"
 )
 
-type SyncInfoResponse struct {
-	Data *beacon.SyncInfo `json:"data"`
+type syncInfoResponse struct {
+	Data *syncInfo `json:"data"`
 }
 
 func buildUrl(addr string, endpoint string) string {
 	return fmt.Sprintf("%s/%s", addr, endpoint)
 }
 
-func getSyncing(addr string, client *http.Client) (*beacon.SyncInfo, error) {
+func getSyncing(addr string, client *http.Client) (*syncInfo, error) {
 
 	url := buildUrl(addr, "eth/v1/node/syncing")
 	res, err := client.Get(url)
@@ -32,7 +30,7 @@ func getSyncing(addr string, client *http.Client) (*beacon.SyncInfo, error) {
 		return nil, err
 	}
 
-	syncInfo := new(SyncInfoResponse)
+	syncInfo := new(syncInfoResponse)
 	err = json.Unmarshal(body, syncInfo)
 	if err != nil {
 		return nil, err
@@ -59,7 +57,7 @@ func isReady(addr string, client *http.Client) error {
 		return err
 	}
 
-	if err := beacon.CheckSyncInfo(syncInfo); err != nil {
+	if err := checkSyncInfo(syncInfo); err != nil {
 		return err
 	}
 
