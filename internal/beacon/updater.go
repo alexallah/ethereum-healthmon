@@ -1,4 +1,4 @@
-package rest
+package beacon
 
 import (
 	"crypto/tls"
@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/alexallah/ethereum-healthmon/internal/beacon"
 	"github.com/alexallah/ethereum-healthmon/internal/common"
 )
 
@@ -40,7 +39,7 @@ func httpClient(certFile string, timeout int64) *http.Client {
 	var tlsConfig *tls.Config
 	if certFile != "" {
 		var err error
-		tlsConfig, err = beacon.GetTLSConfig(certFile)
+		tlsConfig, err = getTLSConfig(certFile)
 		if err != nil {
 			log.Panic("can not get dialOption", err)
 		}
