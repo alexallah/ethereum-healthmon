@@ -112,7 +112,7 @@ services:
       - --rpc-http-host=0.0.0.0
       - --host-allowlist=*
   healthmon:
-    build: /home/alex/Projects/healthmon
+    image: ghcr.io/alexallah/ethereum-healthmon:latest
     command:
       - --chain=execution
       - --addr=execution-node
