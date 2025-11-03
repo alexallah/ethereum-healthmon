@@ -15,7 +15,7 @@ func readJwt(jwtPath string) string {
 		panic(err)
 	}
 	jwt := strings.TrimSpace(string(data))
-	jwt = strings.TrimLeft(jwt, "0x")
+	jwt = strings.TrimPrefix(jwt, "0x")
 	return jwt
 }
 
